@@ -69,7 +69,9 @@ const HeroCanvas = () => {
         // ── Style ──────────────────────────────────────────────
         style={{ width: '100%', height: '100%', display: 'block' }}
         // ── Event config ───────────────────────────────────────
-        eventSource={document.getElementById('root') ?? undefined}
+        // eventSource on window so pointer.x/y updates even when the cursor
+        // is outside the canvas bounds — required for the mouse-tilt effect.
+        eventSource={window}
         eventPrefix="client"
       >
         {/* Dynamic quality scaling — declines DPR if FPS < 50 */}
@@ -86,8 +88,8 @@ const HeroCanvas = () => {
               far={200}
               envPreset="city"
               envIntensity={0.6}
-              autoRotate
-              autoRotateSpeed={0.4}
+              // autoRotate is OFF — the sphere self-rotates via useModelAnimation
+              autoRotate={false}
               enableZoom={false}
               enablePan={false}
             >

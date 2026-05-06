@@ -1,5 +1,18 @@
+import { useState } from 'react'
 import { NAV_LINKS } from '../../utils/constants'
 import usePortfolioStore from '../../store/usePortfolioStore'
+
+const SignalBars = () => (
+  <span className='flex items-end gap-[2px] h-4'>
+    {[3, 5, 7, 9].map((h, i) => (
+      <span
+        key={i}
+        className='w-[3px] rounded-sm bg-[var(--signal)] opacity-80'
+        style={{ height: h + 'px' }}
+      />
+    ))}
+  </span>
+)
 
 const Navbar = () => {
   const { activeSection, isMobileMenuOpen, toggleMobileMenu, closeMobileMenu } =
@@ -11,74 +24,74 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-black/30 backdrop-blur-md border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <button
-          onClick={() => scrollTo('home')}
-          className="text-white font-bold text-xl tracking-wide hover:text-purple-400 transition-colors"
-        >
-          Portfolio<span className="text-purple-400">.</span>
-        </button>
-
-        {/* Desktop nav */}
-        <ul className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map(({ id, label }) => (
-            <li key={id}>
-              <button
-                onClick={() => scrollTo(id)}
-                className={`text-sm font-medium transition-colors ${
-                  activeSection === id
-                    ? 'text-purple-400'
-                    : 'text-gray-300 hover:text-white'
-                }`}
-              >
-                {label}
-              </button>
-            </li>
-          ))}
-        </ul>
-
-        {/* Mobile hamburger */}
-        <button
-          onClick={toggleMobileMenu}
-          className="md:hidden flex flex-col gap-1.5 p-2 group"
-          aria-label="Toggle menu"
-        >
-          <span
-            className={`block h-0.5 w-6 bg-white transition-transform origin-center ${
-              isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''
-            }`}
-          />
-          <span
-            className={`block h-0.5 w-6 bg-white transition-opacity ${
-              isMobileMenuOpen ? 'opacity-0' : ''
-            }`}
-          />
-          <span
-            className={`block h-0.5 w-6 bg-white transition-transform origin-center ${
-              isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
-            }`}
-          />
-        </button>
+    <nav
+      className='fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 py-4 md:px-12'
+      style={{ borderBottom: '1px solid rgba(0,255,178,0.12)', backdropFilter: 'blur(12px)', background: 'rgba(3,1,10,0.6)' }}
+    >
+      {/* Left: status indicator */}
+      <div className='flex items-center gap-3'>
+        <span
+          className='w-2 h-2 rounded-full bg-[var(--signal)]'
+          style={{ animation: 'pulse-dot 2s ease-in-out infinite' }}
+        />
+        <span className='data-readout hidden sm:inline'>LIVE</span>
+        <span className='data-readout hidden sm:inline'>TX-09</span>
+        <SignalBars />
       </div>
 
-      {/* Mobile menu */}
-      {isMobileMenuOpen && (
-        <ul className="md:hidden flex flex-col bg-black/90 px-6 pb-4">
-          {NAV_LINKS.map(({ id, label }) => (
-            <li key={id}>
-              <button
-                onClick={() => scrollTo(id)}
-                className={`w-full text-left py-3 text-sm font-medium border-b border-white/10 transition-colors ${
-                  activeSection === id ? 'text-purple-400' : 'text-gray-300'
-                }`}
+      {/* Desktop nav */}
+      <ul className='hidden md:flex items-center gap-6'>
+        {NAV_LINKS.map((link) => (
+          <li key={link.id}>
+            <button
+              onClick={() => scrollTo(link.id)}
+              className='group flex flex-col items-end leading-tight cursor-pointer bg-transparent border-none p-0'
+            >
+              <span
+                className='data-readout text-[9px] opacity-50 group-hover:opacity-100 group-hover:text-[var(--signal)] transition-colors'
               >
-                {label}
-              </button>
-            </li>
+                {link.tx}
+              </span>
+              <span
+                className={'text-sm font-medium transition-colors ' + (activeSection === link.id ? 'text-[var(--signal)] signal-glow' : 'text-white/70 group-hover:text-white')}
+                style={{ fontFamily: 'var(--font-display)' }}
+              >
+                {link.label}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      {/* Mobile hamburger */}
+      <button
+        className='md:hidden flex flex-col gap-1 cursor-pointer bg-transparent border-none p-1'
+        onClick={toggleMobileMenu}
+        aria-label='Toggle menu'
+        aria-expanded={isMobileMenuOpen}
+      >
+        {[0,1,2].map((i) => (
+          <span key={i} className='block w-5 h-px bg-[var(--signal)]' />
+        ))}
+      </button>
+
+      {/* Mobile drawer */}
+      {isMobileMenuOpen && (
+        <div
+          className='absolute top-full inset-x-0 flex flex-col gap-1 p-4 md:hidden'
+          style={{ background: 'rgba(3,1,10,0.95)', borderBottom: '1px solid rgba(0,255,178,0.12)' }}
+        >
+          {NAV_LINKS.map((link) => (
+            <button
+              key={link.id}
+              onClick={() => scrollTo(link.id)}
+              className='flex justify-between items-center px-3 py-3 text-left cursor-pointer bg-transparent border-none w-full'
+            >
+              <span className='data-readout text-[var(--signal)]'>{link.tx}</span>
+              <span style={{ fontFamily: 'var(--font-display)', color: 'var(--white)' }}>{link.label}</span>
+            </button>
           ))}
-        </ul>
+        </div>
       )}
     </nav>
   )
